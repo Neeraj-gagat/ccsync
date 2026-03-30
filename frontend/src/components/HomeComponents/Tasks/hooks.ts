@@ -250,6 +250,9 @@ export class TasksDatabase extends Dexie {
     this.version(1).stores({
       tasks: 'uuid, email, status, project',
     });
+    this.version(2).stores({
+      tasks: 'uuid, email, status, project, [email+status]',
+    });
     this.tasks = this.table('tasks');
   }
 }

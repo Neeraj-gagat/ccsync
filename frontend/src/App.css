@@ -156,3 +156,12 @@
 .driver-popover.ccsync-tour-popover .driver-skip-btn:hover {
   color: hsl(var(--foreground));
 }
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}

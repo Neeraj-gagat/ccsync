@@ -59,8 +59,9 @@ import { Key } from '@/components/ui/key-button';
 import { AddTaskdialog } from './AddTaskDialog';
 import { TaskDialog } from './TaskDialog';
 import { TaskFormData } from '../../utils/types';
+import { KanbanView } from './Kabana';
 
-const db = new TasksDatabase();
+export const db = new TasksDatabase();
 export let syncTasksWithTwAndDb: () => any;
 
 export const Tasks = (
@@ -69,6 +70,7 @@ export const Tasks = (
     setIsLoading: (val: boolean) => void;
   }
 ) => {
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
   const [showReports, setShowReports] = useState(false);
   const [uniqueTags, setUniqueTags] = useState<string[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -1103,7 +1105,7 @@ export const Tasks = (
   return (
     <section
       id="tasks"
-      className="container py-24 pl-1 pr-1 md:pr-4 md:pl-4 sm:py-32"
+      className="container py-24 pl-1 pr-1 md:pr-4 md:pl-4 sm:py-32 bg-[#060E20]"
     >
       <BottomBar
         projects={uniqueProjects}
@@ -1125,9 +1127,15 @@ export const Tasks = (
           Tasks
         </span>
       </h2>
-      <div className="flex justify-center lg:justify-end w-full px-4 mb-4 mt-4">
+      <div className="flex justify-center lg:justify-end w-full px-4 mb-4 mt-4 gap-4">
         <Button variant="outline" onClick={() => setShowReports(!showReports)}>
           {showReports ? 'Show Tasks' : 'Show Reports'}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => setViewMode(viewMode === 'table' ? 'kanban' : 'table')}
+        >
+          {viewMode === 'table' ? 'Kanban View' : 'Table View'}
         </Button>
         {/* Mobile-only Sync button */}
         <Button
@@ -1162,7 +1170,17 @@ export const Tasks = (
           onMouseEnter={() => setHotkeysEnabled(true)}
           onMouseLeave={() => setHotkeysEnabled(false)}
         >
-          {tasks.length != 0 ? (
+          {viewMode === 'kanban' ? (
+            <div className="mt-10">
+              <KanbanView
+                email={props.email}
+                encryptionSecret={props.encryptionSecret}
+                UUID={props.UUID}
+                onTaskClick={(task) => handleDialogOpenChange(true, task)}
+                tasks={tasks}
+              />
+            </div>
+          ) : tasks.length != 0 ? (
             <>
               <div className="mt-10 pl-1 md:pl-4 pr-1 md:pr-4 bg-muted/50 border shadow-md rounded-lg p-4 h-full pt-12 pb-6 relative overflow-y-auto">
                 {/* Table for displaying tasks */}
@@ -1567,6 +1585,7 @@ export const Tasks = (
               </div>
             </>
           )}
+          {/* closes viewMode ternary */}
         </div>
       )}
     </section>
