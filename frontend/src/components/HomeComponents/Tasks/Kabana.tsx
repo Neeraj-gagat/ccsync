@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { toast } from 'react-toastify';
-import { backgroundClip } from 'html2canvas/dist/types/css/property-descriptors/background-clip';
+// import { backgroundClip } from 'html2canvas/dist/types/css/property-descriptors/background-clip';
 
 interface KanbanViewProps {
   email: string;

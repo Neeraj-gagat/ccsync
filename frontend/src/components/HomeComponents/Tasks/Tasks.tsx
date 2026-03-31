@@ -53,6 +53,12 @@ import {
   fetchTaskwarriorTasks,
   TasksDatabase,
 } from './hooks';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { debounce } from '@/components/utils/utils';
 import { Taskskeleton } from './TaskSkeleton';
 import { Key } from '@/components/ui/key-button';
@@ -60,6 +66,7 @@ import { AddTaskdialog } from './AddTaskDialog';
 import { TaskDialog } from './TaskDialog';
 import { TaskFormData } from '../../utils/types';
 import { KanbanView } from './Kabana';
+import CalendarView from './CalendarView';
 
 export const db = new TasksDatabase();
 export let syncTasksWithTwAndDb: () => any;
@@ -70,7 +77,9 @@ export const Tasks = (
     setIsLoading: (val: boolean) => void;
   }
 ) => {
-  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'kanban' | 'calendar'>(
+    'table'
+  );
   const [showReports, setShowReports] = useState(false);
   const [uniqueTags, setUniqueTags] = useState<string[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -1131,13 +1140,49 @@ export const Tasks = (
         <Button variant="outline" onClick={() => setShowReports(!showReports)}>
           {showReports ? 'Show Tasks' : 'Show Reports'}
         </Button>
-        <Button
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              View:{' '}
+              {viewMode === 'table'
+                ? 'Table'
+                : viewMode === 'kanban'
+                  ? 'Kanban'
+                  : 'Calendar'}
+              <svg
+                className="ml-2 h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => setViewMode('table')}>
+              📋 Table View
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setViewMode('kanban')}>
+              📊 Kanban View
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setViewMode('calendar')}>
+              📅 Calendar View
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {/* <Button
           variant="outline"
           onClick={() => setViewMode(viewMode === 'table' ? 'kanban' : 'table')}
         >
           {viewMode === 'table' ? 'Kanban View' : 'Table View'}
         </Button>
-        {/* Mobile-only Sync button */}
+        // Mobile-only Sync button
         <Button
           className="lg:hidden ml-2 relative"
           variant="outline"
@@ -1160,7 +1205,7 @@ export const Tasks = (
               )}
             </div>
           )}
-        </Button>
+        </Button> */}
       </div>
       {showReports ? (
         <ReportsView tasks={tasks} />
@@ -1178,6 +1223,13 @@ export const Tasks = (
                 UUID={props.UUID}
                 onTaskClick={(task) => handleDialogOpenChange(true, task)}
                 tasks={tasks}
+              />
+            </div>
+          ) : viewMode === 'calendar' ? (
+            <div className="mt-10">
+              <CalendarView
+                tasks={tempTasks} // Use tempTasks to respect filters
+                onTaskClick={(task) => handleDialogOpenChange(true, task)}
               />
             </div>
           ) : tasks.length != 0 ? (
